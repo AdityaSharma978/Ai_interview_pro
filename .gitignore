@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+ui-kit/
+public/Resumes
+# Environment variables
+.env
+
+# Build artifacts
+dist/
+build/
+
+# Optional npm cache
+.npm/
+
+# IDE settings
+.idea/
+.vscode/
+
+*.zip
+*.tar.gz
+*.tar.xz
+*.tar
+*.tgz
+*.rar
+*.gz
+*.xz
+*.7z
+*.exe
+*.msi
+*.apk
+*.dmg
+*.iso
+*.img
+*.jar
+*.html

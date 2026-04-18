@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InterviewAI Pro | Log In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #080B15; color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+    .page-wrap { display: flex; min-height: 100vh; flex-direction: row; }
+    @media (max-width: 900px) { .page-wrap { flex-direction: column; } }
+
+    /* LEFT PANEL */
+    .left-panel {
+      position: relative; width: 45%;
+      background: linear-gradient(145deg, #0d0720 0%, #0a0f22 60%, #060a18 100%);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 48px 52px; overflow: hidden;
+    }
+    @media (max-width: 900px) { .left-panel { display: none !important; } }
+    .left-panel::before {
+      content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(138,43,226,0.22) 0%, transparent 70%);
+      top: -120px; left: -120px; pointer-events: none;
+    }
+    .left-panel::after {
+      content: ''; position: absolute; width: 350px; height: 350px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(65,105,225,0.18) 0%, transparent 70%);
+      bottom: -80px; right: -80px; pointer-events: none;
+    }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      width: 55%; display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 48px 40px; position: relative; background: #080B15;
+    }
+    @media (max-width: 900px) {
+      .right-panel {
+        width: 100% !important;
+        min-height: 100vh;
+        padding: 32px 8px 24px 8px;
+        justify-content: flex-start;
+      }
+      .form-box { max-width: 100vw; }
+    }
+    #canvas-right { position: absolute; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
+    .form-box { position: relative; z-index: 1; width: 100%; max-width: 420px; }
+
+    /* Glass */
+    .glass {
+      background: rgba(255,255,255,0.04); backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.09); border-radius: 20px;
+    }
+
+    /* Gradients */
+    .grad-bg { background: linear-gradient(135deg, #8A2BE2 0%, #4169E1 100%); }
+    .grad-text {
+      background: linear-gradient(135deg, #8A2BE2 0%, #4169E1 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* Inputs */
+    .inp-wrap { position: relative; }
+    .inp-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.32); font-size: 0.85rem; pointer-events: none; }
+    .inp-eye { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.32); cursor: pointer; font-size: 0.85rem; transition: color 0.2s; }
+    .inp-eye:hover { color: rgba(255,255,255,0.7); }
+    .inp {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 12px; padding: 14px 16px 14px 42px; color: #fff; font-size: 0.92rem;
+      font-family: 'Plus Jakarta Sans', sans-serif; outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .inp::placeholder { color: rgba(255,255,255,0.3); }
+    .inp:focus { border-color: rgba(138,43,226,0.6); box-shadow: 0 0 0 3px rgba(138,43,226,0.12); }
+    .inp-no-icon { padding-left: 16px; }
+
+    /* CTA Button */
+    .cta-btn {
+      position: relative; overflow: hidden; z-index: 1; width: 100%; padding: 14px;
+      border: none; border-radius: 12px; color: #fff; font-size: 0.97rem; font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+    }
+    .cta-btn::before {
+      content: ''; position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(45deg, #8A2BE2, #4169E1, #8A2BE2); background-size: 200% 200%;
+      animation: gradShift 5s ease infinite;
+    }
+    .cta-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .cta-btn:active { transform: scale(0.98); }
+    @keyframes gradShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+    /* Google */
+    .google-btn {
+      width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: #fff;
+      font-size: 0.92rem; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer; transition: background 0.25s, border-color 0.2s, transform 0.15s;
+    }
+    .google-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+    /* Divider */
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.09); }
+
+    /* Pulse */
+    @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 5px rgba(138,43,226,0.5); } 50% { box-shadow: 0 0 22px 6px rgba(138,43,226,0.7); } }
+    .pulse { animation: pulseGlow 3s infinite; }
+
+    /* Shimmer */
+    @keyframes shimmer { 0% { transform: rotate(45deg) translate(-120%,-120%); } 100% { transform: rotate(45deg) translate(120%,120%); } }
+    .shimmer { position: relative; overflow: hidden; }
+    .shimmer::after {
+      content: ''; position: absolute; inset: -100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 40%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0) 100%);
+      animation: shimmer 4s infinite linear;
+    }
+
+    /* Neon border */
+    .neon { position: relative; }
+    .neon::before {
+      content: ''; position: absolute; inset: -1px;
+      background: linear-gradient(45deg, #8A2BE2, #4169E1, #8A2BE2);
+      z-index: -1; border-radius: inherit; filter: blur(4px); opacity: 0.65;
+      animation: neonPulse 3s linear infinite;
+    }
+    @keyframes neonPulse { 0%,100% { opacity: 0.55; filter: blur(3px); } 50% { opacity: 0.9; filter: blur(5px); } }
+
+    /* Fade up */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .fu  { animation: fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) both; }
+    .d1  { animation-delay: 0.08s; } .d2 { animation-delay: 0.16s; }
+    .d3  { animation-delay: 0.24s; } .d4 { animation-delay: 0.32s; }
+
+    /* Feature chips */
+    .chip {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 13px 16px; margin-bottom: 12px; backdrop-filter: blur(8px);
+    }
+    .chip-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+
+    /* Stat pills */
+    .stat-pill {
+      background: rgba(138,43,226,0.12); border: 1px solid rgba(138,43,226,0.25);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600;
+      color: #c084fc; display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: rgba(10,12,25,0.97); border: 1px solid rgba(138,43,226,0.35); backdrop-filter: blur(16px);
+      border-radius: 12px; padding: 12px 20px; font-size: 0.88rem;
+      display: flex; align-items: center; gap: 10px;
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); z-index: 9999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.err  { border-color: rgba(239,68,68,0.45); }
+
+    /* Forgot overlay */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(5,7,15,0.82); backdrop-filter: blur(6px);
+      z-index: 100; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #0f1220; border: 1px solid rgba(138,43,226,0.3); border-radius: 20px;
+      padding: 40px 36px; width: 100%; max-width: 400px; position: relative;
+      animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    /* OTP boxes */
+    .otp-box {
+      width: 48px; height: 54px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      text-align: center; font-size: 1.35rem; font-weight: 700; color: #fff; outline: none;
+      font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otp-box:focus { border-color: rgba(138,43,226,0.7); box-shadow: 0 0 0 3px rgba(138,43,226,0.18); }
+    .otp-box.filled { border-color: rgba(138,43,226,0.5); background: rgba(138,43,226,0.08); }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrap">
+
+  <!-- ════════ LEFT PANEL ════════ -->
+  <div class="left-panel">
+    <div>
+      <a href="/" class="flex items-center gap-3 mb-16">
+        <div class="w-10 h-10 grad-bg rounded-xl flex items-center justify-center pulse">
+          <i class="fas fa-robot text-white"></i>
+        </div>
+        <span class="text-xl font-bold" style="font-family:'Syne',sans-serif;">
+          InterviewAI<span class="grad-text">Pro</span>
+        </span>
+      </a>
+
+      <h1 class="text-4xl font-bold leading-tight mb-4" style="font-family:'Syne',sans-serif;">
+        Land your<br/><span class="grad-text">dream job</span><br/>with AI coaching.
+      </h1>
+      <p class="text-gray-400 text-sm leading-relaxed mb-10" style="max-width:320px;">
+        Practise with a personalised AI interviewer, get real-time feedback, and walk into every interview with confidence.
+      </p>
+
+      <div>
+        <div class="chip">
+          <div class="chip-icon grad-bg"><i class="fas fa-brain text-white text-sm"></i></div>
+          <div>
+            <p class="text-sm font-semibold text-white">AI-Powered Questions</p>
+            <p class="text-xs text-gray-400">Tailored to your resume &amp; role</p>
+          </div>
+        </div>
+        <div class="chip">
+          <div class="chip-icon" style="background:rgba(65,105,225,0.25);">
+            <i class="fas fa-chart-line text-blue-300 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-white">Real-time Analytics</p>
+            <p class="text-xs text-gray-400">Confidence, clarity &amp; structure scores</p>
+          </div>
+        </div>
+        <div class="chip">
+          <div class="chip-icon" style="background:rgba(138,43,226,0.2);">
+            <i class="fas fa-microphone text-purple-300 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-white">Voice &amp; Tone Analysis</p>
+            <p class="text-xs text-gray-400">Improve how you communicate</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-3 flex-wrap">
+      <div class="stat-pill"><i class="fas fa-users"></i> 10K+ Users</div>
+      <div class="stat-pill"><i class="fas fa-star"></i> 4.8 Rating</div>
+      <div class="stat-pill"><i class="fas fa-trophy"></i> 87% Success</div>
+    </div>
+  </div>
+
+  <!-- ════════ RIGHT PANEL ════════ -->
+  <div class="right-panel">
+    <canvas id="canvas-right"></canvas>
+
+    <div class="form-box w-full max-w-md mx-auto">
+
+      <!-- Back to Dashboard button -->
+      <a href="/dashboard" class="outline-btn" style="margin-bottom:18px;display:inline-flex;align-items:center;gap:8px;width:auto;padding:10px 22px;font-size:0.97rem;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+
+      <!-- Mobile logo -->
+      <div class="flex items-center gap-3 mb-10 md:hidden">
+        <div class="w-9 h-9 grad-bg rounded-xl flex items-center justify-center pulse">
+          <i class="fas fa-robot text-white text-sm"></i>
+        </div>
+        <span class="font-bold text-lg" style="font-family:'Syne',sans-serif;">
+          InterviewAI<span class="grad-text">Pro</span>
+        </span>
+      </div>
+
+      <div class="fu">
+        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-purple-300 mb-4" style="background:rgba(138,43,226,0.15);border:1px solid rgba(138,43,226,0.25);">
+          <i class="fas fa-sparkles mr-2"></i> Welcome back
+        </div>
+        <h2 class="text-3xl font-bold mb-1" style="font-family:'Syne',sans-serif;">Log in to your account</h2>
+        <p class="text-gray-400 text-sm mb-8">Continue your interview preparation journey.</p>
+      </div>
+
+      <!-- Google -->
+      <div class="fu d1">
+        <a class="google-btn" href="/auth/google" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.2 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.6 13 17.9 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
+            <path fill="#FBBC05" d="M10.7 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6L2.3 13.3A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.8 10.7l7.9-6.1z"/>
+            <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2.1 1.4-4.8 2.3-7.7 2.3-6.1 0-11.4-4.1-13.3-9.5l-7.9 6.1C6.7 42.6 14.7 48 24 48z"/>
+          </svg>
+          <span style="margin-left:8px;">Continue with Google</span>
+        </a>
+      </div>
+
+      <div class="divider fu d2">
+        <span class="text-gray-500 text-xs font-medium">or continue with email</span>
+      </div>
+
+      <!-- Form card -->
+      <div class="glass shimmer neon fu d2" style="padding:24px; margin-bottom:20px;">
+        <form action="/login" method="POST" style="display:flex;flex-direction:column;gap:0;">
+          <% if (typeof error !== 'undefined' && error) { %>
+            <div style="color:#f87171;text-align:center;margin-bottom:10px;font-size:0.95em;"> <%= error %> </div>
+          <% } %>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="inp-wrap">
+              <i class="fas fa-envelope inp-icon"></i>
+              <input class="inp" type="email" name="email" placeholder="Email address" autocomplete="email" required />
+            </div>
+            <div class="inp-wrap">
+              <i class="fas fa-lock inp-icon"></i>
+              <input class="inp" id="password" type="password" name="password" placeholder="Password" style="padding-right:42px;" autocomplete="current-password" required />
+              <i class="fas fa-eye inp-eye" onclick="togglePw('password',this)"></i>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 18px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="remember" style="accent-color:#8A2BE2;width:15px;height:15px;" />
+              <span style="font-size:0.82rem;color:rgba(255,255,255,0.45);">Remember me</span>
+            </label>
+            <button type="button" style="font-size:0.82rem;color:#a78bfa;background:none;border:none;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='#a78bfa'" onclick="openForgot()">
+              Forgot password?
+            </button>
+          </div>
+
+          <button class="cta-btn" type="submit">
+            Log In <i class="fas fa-arrow-right" style="margin-left:8px;"></i>
+          </button>
+        </form>
+      </div>
+
+      <p class="text-center fu d3" style="color:rgba(255,255,255,0.45);font-size:0.88rem;">
+        Don't have an account?
+        <a href="/signup" style="color:#a78bfa;font-weight:600;margin-left:4px;text-decoration:none;transition:color 0.2s;"
+           onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='#a78bfa'">
+          Create one free
+        </a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════ FORGOT PASSWORD MODAL ════════ -->
+<div class="overlay" id="overlay-forgot" onclick="closeForgotBg(event)">
+  <div class="modal">
+
+    <!-- Step 1 -->
+    <div id="fp1">
+      <button onclick="closeForgot()" style="background:none;border:none;color:rgba(255,255,255,0.45);font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:24px;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
+        <i class="fas fa-times"></i> Close
+      </button>
+      <div style="text-align:center;margin-bottom:28px;">
+        <div class="grad-bg pulse" style="width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <i class="fas fa-key" style="color:#fff;font-size:1.2rem;"></i>
+        </div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:6px;">Forgot password?</h3>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;">Enter your email — we'll send a 6-digit reset code.</p>
+      </div>
+      <div class="inp-wrap" style="margin-bottom:18px;">
+        <i class="fas fa-envelope inp-icon"></i>
+        <input class="inp" type="email" id="fp-email" placeholder="you@example.com" />
+      </div>
+      <button class="cta-btn" onclick="fpSend()">
+        Send Reset Code <i class="fas fa-paper-plane" style="margin-left:8px;"></i>
+      </button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="fp2" style="display:none;">
+            <button onclick="goBackToForgotEmail()" style="background:none;border:none;color:rgba(255,255,255,0.45);font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:18px;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+      <div style="text-align:center;margin-bottom:24px;">
+        <div class="grad-bg pulse" style="width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <i class="fas fa-shield-halved" style="color:#fff;font-size:1.2rem;"></i>
+        </div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:4px;">Enter reset code</h3>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.82rem;">Sent to <span id="fp-email-show" style="color:#fff;font-weight:600;"></span></p>
+      </div>
+
+      <div id="fp-otp-wrap" style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,0,'fp')" onkeydown="otpKd(event,0,'fp')" />
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,1,'fp')" onkeydown="otpKd(event,1,'fp')" />
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,2,'fp')" onkeydown="otpKd(event,2,'fp')" />
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,3,'fp')" onkeydown="otpKd(event,3,'fp')" />
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,4,'fp')" onkeydown="otpKd(event,4,'fp')" />
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" oninput="otpIn(this,5,'fp')" onkeydown="otpKd(event,5,'fp')" />
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">
+        <div class="inp-wrap">
+          <i class="fas fa-lock inp-icon"></i>
+          <input class="inp" type="password" id="fp-newpw" placeholder="New password" style="padding-right:42px;" />
+          <i class="fas fa-eye inp-eye" onclick="togglePw('fp-newpw',this)"></i>
+        </div>
+        <div class="inp-wrap">
+          <i class="fas fa-lock inp-icon"></i>
+          <input class="inp" type="password" id="fp-confirmpw" placeholder="Confirm new password" style="padding-right:42px;" />
+          <i class="fas fa-eye inp-eye" onclick="togglePw('fp-confirmpw',this)"></i>
+        </div>
+      </div>
+      <button class="cta-btn" onclick="fpReset()">
+        Reset Password <i class="fas fa-check" style="margin-left:8px;"></i>
+      </button>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="fp3" style="display:none;text-align:center;padding:16px 0;">
+      <div class="grad-bg pulse" style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <i class="fas fa-check" style="color:#fff;font-size:1.4rem;"></i>
+      </div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:6px;">Password Reset!</h3>
+      <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:22px;">You can now log in with your new password.</p>
+      <button class="cta-btn" onclick="closeForgot()">Back to Log In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i id="toast-icon" class="fas fa-circle-check" style="color:#4ade80;"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- Move scripts to end of body for proper DOM loading -->
+<!-- End main content -->
+</div>
+
+<!-- Scripts moved to end of body for global scope and DOM readiness -->
+<script>
+// Go back from step 2 to step 1 in forgot password modal
+function goBackToForgotEmail() {
+  document.getElementById('fp2').style.display = 'none';
+  document.getElementById('fp1').style.display = '';
+}
+// Particle BG
+(function() {
+  const c = document.getElementById('canvas-right');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, c.offsetWidth / c.offsetHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true });
+  function resize() {
+    renderer.setSize(c.offsetWidth, c.offsetHeight);
+    camera.aspect = c.offsetWidth / c.offsetHeight;
+    camera.updateProjectionMatrix();
+  }
+  resize(); window.addEventListener('resize', resize);
+  renderer.setClearColor(0, 0); camera.position.z = 50;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(700 * 3);
+  for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - 0.5) * 90;
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mesh = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.2, color: 0x8A2BE2, transparent: true, opacity: 0.55 }));
+  scene.add(mesh);
+  (function loop() { requestAnimationFrame(loop); mesh.rotation.x += 0.0003; mesh.rotation.y += 0.0005; renderer.render(scene, camera); })();
+})();
+
+// Helpers
+const isEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+let toastT;
+function toast(msg, err) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').className = err ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
+  document.getElementById('toast-icon').style.color = err ? '#f87171' : '#4ade80';
+  el.className = 'toast' + (err ? ' err' : '');
+  clearTimeout(toastT);
+  setTimeout(() => el.classList.add('show'), 10);
+  toastT = setTimeout(() => el.classList.remove('show'), 3500);
+}
+function togglePw(id, icon) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+}
+
+// OTP
+function otpBoxes(prefix) { return document.querySelectorAll(`#${prefix}-otp-wrap .otp-box`); }
+function otpIn(el, idx, prefix) {
+  el.value = el.value.replace(/\D/g,'').slice(-1);
+  el.classList.toggle('filled', !!el.value);
+  if (el.value && idx < 5) otpBoxes(prefix)[idx+1].focus();
+}
+function otpKd(e, idx, prefix) {
+  if (e.key === 'Backspace' && !otpBoxes(prefix)[idx].value && idx > 0) otpBoxes(prefix)[idx-1].focus();
+}
+function otpVal(prefix) { return Array.from(otpBoxes(prefix)).map(b => b.value).join(''); }
+
+// Forgot
+function openForgot() { document.getElementById('overlay-forgot').classList.add('open'); }
+function closeForgot() {
+  document.getElementById('overlay-forgot').classList.remove('open');
+  document.getElementById('fp1').style.display = '';
+  document.getElementById('fp2').style.display = 'none';
+  document.getElementById('fp3').style.display = 'none';
+  document.getElementById('fp-email').value = '';
+  otpBoxes('fp').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+  document.getElementById('fp-newpw').value = '';
+  document.getElementById('fp-confirmpw').value = '';
+}
+function closeForgotBg(e) { if (e.target === document.getElementById('overlay-forgot')) closeForgot(); }
+
+async function fpSend() {
+  const email = document.getElementById('fp-email').value.trim();
+  if (!isEmail(email)) { toast('Please enter a valid email.', true); return; }
+  try {
+    const res = await fetch('/api/forgot/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!data.success) throw new Error(data.error || 'Failed to send code');
+    document.getElementById('fp-email-show').textContent = email;
+    document.getElementById('fp1').style.display = 'none';
+    document.getElementById('fp2').style.display = '';
+    toast('Reset code sent to ' + email);
+    setTimeout(() => otpBoxes('fp')[0].focus(), 200);
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+async function fpReset() {
+  const email = document.getElementById('fp-email-show').textContent;
+  const code = otpVal('fp');
+  const nw = document.getElementById('fp-newpw').value;
+  const cf = document.getElementById('fp-confirmpw').value;
+  if (code.length < 6)  { toast('Enter all 6 digits.', true); return; }
+  if (nw.length < 8)    { toast('Password must be 8+ characters.', true); return; }
+  if (nw !== cf)         { toast('Passwords do not match.', true); return; }
+  // Verify code first
+  try {
+    const verify = await fetch('/api/forgot/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code })
+    });
+    let vdata;
+    try {
+      vdata = await verify.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!vdata.success) throw new Error(vdata.error || 'Invalid code');
+    // Now reset password
+    const reset = await fetch('/api/forgot/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, newPassword: nw })
+    });
+    let rdata;
+    try {
+      rdata = await reset.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!rdata.success) throw new Error(rdata.error || 'Failed to reset password');
+    document.getElementById('fp2').style.display = 'none';
+    document.getElementById('fp3').style.display = '';
+    toast('Password reset!');
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('overlay-forgot').classList.contains('open')) return;
+  handleLogin();
+});
+</script>
+</body>
+</html>
+  const pw    = document.getElementById('password').value;
+  if (!isEmail(email)) { toast('Please enter a valid email.', true); return; }
+  if (!pw)             { toast('Please enter your password.', true); return; }
+  // ── API: POST /api/auth/login { email, password } ──
+    showLoginPopup();
+    setTimeout(() => window.location.href = '/dashboard', 5000);
+  }
+
+  function showLoginPopup() {
+    let popup = document.createElement('div');
+    popup.className = 'login-success-popup';
+    popup.innerHTML = `
+      <div class="popup-glass">
+        <i class="fas fa-circle-check popup-icon"></i>
+        <div class="popup-title">Welcome Back!</div>
+        <div class="popup-msg">Login successful.<br>Redirecting to dashboard...</div>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.classList.add('show'), 50);
+    setTimeout(() => { popup.classList.remove('show'); setTimeout(() => popup.remove(), 500); }, 4800);
+  }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  .login-success-popup {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .login-success-popup.show {
+    opacity: 1; pointer-events: auto;
+  }
+  .login-success-popup .popup-glass {
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+    padding: 44px 38px 32px 38px;
+    text-align: center;
+    border: 1.5px solid rgba(255,255,255,0.13);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    min-width: 320px;
+  }
+  .login-success-popup .popup-icon {
+    font-size: 2.8rem;
+    color: #4ade80;
+    margin-bottom: 12px;
+    animation: pop-bounce 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .login-success-popup .popup-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .login-success-popup .popup-msg {
+    font-size: 1.08rem;
+    color: #e0e7ef;
+    margin-bottom: 0;
+  }
+  @keyframes pop-bounce {
+    0% { transform: scale(0.7); opacity: 0; }
+    60% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+}
+
+function handleGoogle() {
+  // window.location.href = '/auth/google';
+  toast('Redirecting to Google…');
+}
+
+// Forgot
+function openForgot() { document.getElementById('overlay-forgot').classList.add('open'); }
+function closeForgot() {
+  document.getElementById('overlay-forgot').classList.remove('open');
+  document.getElementById('fp1').style.display = '';
+  document.getElementById('fp2').style.display = 'none';
+  document.getElementById('fp3').style.display = 'none';
+  document.getElementById('fp-email').value = '';
+  otpBoxes('fp').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+  document.getElementById('fp-newpw').value = '';
+  document.getElementById('fp-confirmpw').value = '';
+}
+function closeForgotBg(e) { if (e.target === document.getElementById('overlay-forgot')) closeForgot(); }
+
+
+async function fpSend() {
+  const email = document.getElementById('fp-email').value.trim();
+  if (!isEmail(email)) { toast('Please enter a valid email.', true); return; }
+  try {
+    const res = await fetch('/api/forgot/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!data.success) throw new Error(data.error || 'Failed to send code');
+    document.getElementById('fp-email-show').textContent = email;
+    document.getElementById('fp1').style.display = 'none';
+    document.getElementById('fp2').style.display = '';
+    toast('Reset code sent to ' + email);
+    setTimeout(() => otpBoxes('fp')[0].focus(), 200);
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+
+async function fpReset() {
+  const email = document.getElementById('fp-email-show').textContent;
+  const code = otpVal('fp');
+  const nw = document.getElementById('fp-newpw').value;
+  const cf = document.getElementById('fp-confirmpw').value;
+  if (code.length < 6)  { toast('Enter all 6 digits.', true); return; }
+  if (nw.length < 8)    { toast('Password must be 8+ characters.', true); return; }
+  if (nw !== cf)         { toast('Passwords do not match.', true); return; }
+  // Verify code first
+  try {
+    const verify = await fetch('/api/forgot/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code })
+    });
+    let vdata;
+    try {
+      vdata = await verify.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!vdata.success) throw new Error(vdata.error || 'Invalid code');
+    // Now reset password
+    const reset = await fetch('/api/forgot/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, newPassword: nw })
+    });
+    let rdata;
+    try {
+      rdata = await reset.json();
+    } catch (err) {
+      throw new Error('An unexpected error occurred. Please try again.');
+    }
+    if (!rdata.success) throw new Error(rdata.error || 'Failed to reset password');
+    document.getElementById('fp2').style.display = 'none';
+    document.getElementById('fp3').style.display = '';
+    toast('Password reset!');
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('overlay-forgot').classList.contains('open')) return;
+  handleLogin();
+});
+</script>
+</body>
+</html>

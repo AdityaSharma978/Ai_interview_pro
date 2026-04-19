@@ -22,4 +22,3 @@ InterviewAI Pro is an AI-powered web application designed to help users prepare 
 
 ---
 
-## 📂 Project Structure
